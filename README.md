@@ -72,6 +72,14 @@ After that, restart Firefox.
 
 Some Firefox preferences may change, disappear, or behave differently in future Firefox versions. PrivFox is intentionally simple and transparent, so you can inspect every preference before running it.
 
+## Contact
+
+For project-related contact:
+
+```text
+byaldon@proton.me
+```
+
 ## Disclaimer
 
 PrivFox is an independent project and is not affiliated with, endorsed by, or sponsored by Mozilla or Firefox.
