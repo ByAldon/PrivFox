@@ -2,12 +2,12 @@
 setlocal EnableExtensions
 chcp 65001 >nul
 
-title PrivFox 0.0.3
+title PrivFox 0.0.4
 color 0B
 
 echo.
 echo ============================================================
-echo                        PrivFox 0.0.3
+echo                        PrivFox 0.0.4
 echo ============================================================
 echo Firefox privacy helper for Windows
 echo.

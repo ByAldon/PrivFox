@@ -1,6 +1,6 @@
 <# 
 PrivFox
-Version: 0.0.3
+Version: 0.0.4
 
 A simple privacy helper for Firefox profiles.
 
@@ -32,7 +32,7 @@ or sponsored by Mozilla or Firefox. Firefox is a trademark of the Mozilla Founda
 #>
 
 $ErrorActionPreference = "Stop"
-$PrivFoxVersion = "0.0.3"
+$PrivFoxVersion = "0.0.4"
 
 Write-Host ""
 Write-Host "PrivFox $PrivFoxVersion" -ForegroundColor Cyan
