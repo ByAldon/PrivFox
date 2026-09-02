@@ -1,6 +1,6 @@
 <# 
 PrivFox
-Version: 0.0.2
+Version: 0.0.3
 
 A simple privacy helper for Firefox profiles.
 
@@ -32,7 +32,7 @@ or sponsored by Mozilla or Firefox. Firefox is a trademark of the Mozilla Founda
 #>
 
 $ErrorActionPreference = "Stop"
-$PrivFoxVersion = "0.0.2"
+$PrivFoxVersion = "0.0.3"
 
 Write-Host ""
 Write-Host "PrivFox $PrivFoxVersion" -ForegroundColor Cyan
@@ -147,6 +147,8 @@ if (-not $profileDirs) {
 
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $changedCount = 0
+$verifiedCount = 0
+$failedProfiles = @()
 
 foreach ($profile in $profileDirs) {
     $profilePath = $profile.FullName
@@ -155,27 +157,72 @@ foreach ($profile in $profileDirs) {
     Write-Host "Profile found:" -ForegroundColor Green
     Write-Host "  $profilePath"
 
-    if (Test-Path $userJsPath) {
-        $backupPath = Join-Path $profilePath "user.js.backup-$timestamp"
-        Copy-Item -Path $userJsPath -Destination $backupPath -Force
-        Write-Host "  Existing user.js backed up as:"
-        Write-Host "  $backupPath"
-    }
+    try {
+        if (Test-Path $userJsPath) {
+            $backupPath = Join-Path $profilePath "user.js.backup-$timestamp"
+            Copy-Item -Path $userJsPath -Destination $backupPath -Force
+            Write-Host "  Existing user.js backed up as:"
+            Write-Host "  $backupPath"
+        }
 
-    Set-Content -Path $userJsPath -Value $settings -Encoding UTF8
-    Write-Host "  user.js updated." -ForegroundColor Cyan
-    Write-Host ""
-    $changedCount++
+        # ASCII is sufficient for user.js and avoids encoding/BOM compatibility issues.
+        Set-Content -Path $userJsPath -Value $settings -Encoding ASCII -Force
+        $changedCount++
+
+        # Verify that the file exists and contains several core PrivFox preferences.
+        if (-not (Test-Path $userJsPath)) {
+            throw "user.js was not created."
+        }
+
+        $writtenContent = Get-Content -Path $userJsPath -Raw
+        $requiredChecks = @(
+            'user_pref("datareporting.healthreport.uploadEnabled", false);',
+            'user_pref("toolkit.telemetry.enabled", false);',
+            'user_pref("app.shield.optoutstudies.enabled", false);',
+            'user_pref("browser.urlbar.quicksuggest.enabled", false);'
+        )
+
+        foreach ($requiredSetting in $requiredChecks) {
+            if (-not $writtenContent.Contains($requiredSetting)) {
+                throw "Verification failed: a required setting is missing from user.js."
+            }
+        }
+
+        $verifiedCount++
+        Write-Host "  user.js updated and verified." -ForegroundColor Cyan
+        Write-Host ""
+    }
+    catch {
+        $failedProfiles += $profilePath
+        Write-Host "  FAILED: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host ""
+    }
 }
 
-Write-Host "Done." -ForegroundColor Green
-Write-Host "$changedCount Firefox profile(s) updated."
-Write-Host ""
-Write-Host "Next steps:"
-Write-Host "1. Start Firefox."
-Write-Host "2. Open about:config if you want to verify the settings."
-Write-Host "3. Search for: datareporting.healthreport.uploadEnabled"
-Write-Host ""
-Write-Host "To undo this, delete user.js from your Firefox profile folder or restore the backup."
-Write-Host ""
-Read-Host "Press Enter to exit"
+Write-Host "------------------------------------------------------------"
+if ($failedProfiles.Count -eq 0 -and $verifiedCount -gt 0) {
+    Write-Host "SUCCESS" -ForegroundColor Green
+    Write-Host "$verifiedCount Firefox profile(s) updated and verified."
+    Write-Host ""
+    Write-Host "Next steps:"
+    Write-Host "1. Start Firefox."
+    Write-Host "2. Open about:config if you want to verify a setting manually."
+    Write-Host "3. Search for: datareporting.healthreport.uploadEnabled"
+    Write-Host ""
+    Write-Host "To undo this, delete user.js or restore the backup file."
+    exit 0
+}
+else {
+    Write-Host "FAILED" -ForegroundColor Red
+    Write-Host "$verifiedCount profile(s) succeeded; $($failedProfiles.Count) profile(s) failed."
+    if ($failedProfiles.Count -gt 0) {
+        Write-Host ""
+        Write-Host "Failed profile(s):"
+        foreach ($failedProfile in $failedProfiles) {
+            Write-Host "  $failedProfile"
+        }
+    }
+    Write-Host ""
+    Write-Host "No success is reported unless user.js was actually written and verified."
+    exit 1
+}
