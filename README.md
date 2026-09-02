@@ -2,12 +2,7 @@
 
 **A simple privacy helper for Firefox profiles.**
 
-PrivFox is not a browser. It is a small script that applies privacy-focused Firefox preferences to your local Firefox profiles by creating or updating Firefox's `user.js` configuration file.
-
-PrivFox currently includes:
-
-- `privfox.ps1` for Windows
-- `privfox.sh` for Linux
+PrivFox is not a browser. It is a small Windows PowerShell script that applies privacy-focused Firefox preferences to your local Firefox profiles by creating or updating Firefox's `user.js` configuration file.
 
 ## What PrivFox does
 
@@ -25,31 +20,14 @@ Before changing anything, PrivFox creates a backup of an existing `user.js` file
 
 ## Requirements
 
-### Windows
-
 - Windows 10 or Windows 11
 - Mozilla Firefox installed
 - Firefox must have been opened at least once so a profile folder exists
-
-### Linux
-
-- A Linux distribution with Bash
-- Mozilla Firefox installed
-- Firefox must have been opened at least once so a profile folder exists
-
-The Linux script checks these common Firefox profile locations:
-
-- `~/.mozilla/firefox`
-- `~/snap/firefox/common/.mozilla/firefox`
-- `~/.var/app/org.mozilla.firefox/.mozilla/firefox`
 
 ## How to use
 
 1. Download or clone this repository.
 2. Close Firefox completely.
-
-### Windows
-
 3. Right-click `privfox.ps1`.
 4. Choose **Run with PowerShell**.
 
@@ -61,41 +39,12 @@ powershell -ExecutionPolicy Bypass -File .\privfox.ps1
 
 Then start Firefox again.
 
-### Linux
-
-3. Open a terminal in the repository folder.
-4. Make the script executable:
-
-```bash
-chmod +x ./privfox.sh
-```
-
-5. Run the script:
-
-```bash
-./privfox.sh
-```
-
-Then start Firefox again.
-
 ## What files does it change?
-
-### Windows
 
 PrivFox looks for Firefox profiles here:
 
 ```text
 %APPDATA%\Mozilla\Firefox\Profiles
-```
-
-### Linux
-
-PrivFox looks for Firefox profiles in these common locations:
-
-```text
-~/.mozilla/firefox
-~/snap/firefox/common/.mozilla/firefox
-~/.var/app/org.mozilla.firefox/.mozilla/firefox
 ```
 
 For each profile, it writes:
@@ -127,7 +76,9 @@ Some Firefox preferences may change, disappear, or behave differently in future 
 
 For project-related contact:
 
+```text
 byaldon@proton.me
+```
 
 ## Disclaimer
 
