@@ -1,3 +1,5 @@
+## This application has been moved to another instance. No new updates will be posted here. Go to: https://github.com/ByAldon/I-am-leaving-github for more information.
+
 # PrivFox
 
 **A simple privacy helper for Firefox profiles.**
